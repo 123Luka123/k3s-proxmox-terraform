@@ -1,5 +1,5 @@
 ---
-- name: Install QEMU Guest Agent on all nodes
+- name: Install System Utilities on all nodes
   hosts: all
   become: yes
   tasks:
@@ -18,6 +18,11 @@
         name: qemu-guest-agent
         state: started
         enabled: yes
+
+    - name: Install micro editor
+      apt:
+        name: micro
+        state: present
 
 - name: Install K3s on Control Plane
   hosts: control_plane

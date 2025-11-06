@@ -12,6 +12,7 @@ This guide will walk you through deploying a production-ready K3s Kubernetes clu
 - Automated deployment
 - Custom VM IDs starting from 500
 - QEMU Guest Agent pre-installed and enabled
+- Micro Editor pre-installed for quick file editing
 
 ---
 
