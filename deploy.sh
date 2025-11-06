@@ -89,7 +89,17 @@ cd ansible
 ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 
-# Step 10: Display cluster info
+# Step 10: Optional ArgoCD installation
+echo -e "\n${YELLOW}Do you want to install ArgoCD? (yes/no)${NC}"
+read -r response
+if [[ "$response" =~ ^[Yy][Ee][Ss]$ ]]; then
+    echo -e "\n${GREEN}Step 10: Installing ArgoCD with Ansible...${NC}"
+    cd ansible
+    ansible-playbook -i inventory.yml argocd-install.yml
+    cd ..
+fi
+
+# Step 11: Display cluster info
 echo -e "\n${GREEN}================================${NC}"
 echo -e "${GREEN}Deployment Complete!${NC}"
 echo -e "${GREEN}================================${NC}"
@@ -106,5 +116,14 @@ echo -e "   ${YELLOW}kubectl get nodes${NC}"
 echo ""
 echo "3. SSH to control plane:"
 echo -e "   ${YELLOW}$(terraform output -raw ssh_command_control_plane)${NC}"
+echo ""
+if [[ "$response" =~ ^[Yy][Ee][Ss]$ ]]; then
+    echo -e "\n${GREEN}ArgoCD Information:${NC}"
+    echo "To access ArgoCD UI:"
+    echo -e "   ${YELLOW}kubectl port-forward svc/argocd-server -n argocd 8080:80${NC}"
+    echo "Then open: http://localhost:8080"
+    echo "Username: admin"
+    echo "Password: (check the ArgoCD secret in the argocd namespace)"
+fi
 echo ""
 echo -e "${GREEN}Kubeconfig saved to: $(pwd)/kubeconfig${NC}"

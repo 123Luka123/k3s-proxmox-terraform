@@ -43,6 +43,7 @@ Copy each of the provided files into your project directory:
 9. **ansible/inventory.yml** - Ansible inventory
 10. **ansible/k3s-install.yml** - K3s installation playbook
 11. **ansible/system-utils-install.yml** - System utilities installation playbook
+12. **ansible/argocd-install.yml** - ArgoCD installation playbook
 11. **docs/pve-info-checklist-example.md** - Proxmox setup checklist template
 
 **Quick way using VS Code:**
@@ -59,7 +60,7 @@ mkdir -p ansible
 # Create empty files
 touch main.tf variables.tf outputs.tf terraform.tfvars.example
 touch deploy.sh setup.sh README.md .gitignore
-touch ansible/inventory.yml ansible/k3s-install.yml ansible/system-utils-install.yml
+touch ansible/inventory.yml ansible/k3s-install.yml ansible/system-utils-install.yml ansible/argocd-install.yml
 
 # Then edit each file and paste the content
 ```
@@ -152,7 +153,8 @@ The script will:
 6. Wait for VMs to boot ⏱️
 7. Install system utilities 🛠️
 8. Install K3s cluster 🚀
-9. Save kubeconfig locally 📝
+9. Optional: Install ArgoCD (GitOps) ⚡
+10. Save kubeconfig locally 📝
 
 **Expected duration:** 5-10 minutes
 
@@ -313,7 +315,15 @@ ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 ```
 
-### 9. Configure Local Access
+### 9. Optional: Install ArgoCD
+
+```bash
+cd ansible
+ansible-playbook -i inventory.yml argocd-install.yml
+cd ..
+```
+
+### 10. Configure Local Access
 
 ```bash
 export KUBECONFIG=$(pwd)/kubeconfig
@@ -582,11 +592,12 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 
 ## 🎯 Next Steps
 
-1. **Learn kubectl basics**: [Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
-2. **Deploy your first app**: Follow the test application example above
-3. **Setup monitoring**: Install Prometheus and Grafana
-4. **Configure backups**: Setup Velero for cluster backups
-5. **Secure your cluster**: Implement Network Policies and RBAC
+1. **Access ArgoCD** (if installed): Use port-forward to access the UI
+2. **Learn kubectl basics**: [Kubernetes Basics](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
+3. **Deploy your first app**: Follow the test application example above
+4. **Setup monitoring**: Install Prometheus and Grafana
+5. **Configure backups**: Setup Velero for cluster backups
+6. **Secure your cluster**: Implement Network Policies and RBAC
 
 ---
 
@@ -615,6 +626,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 - [ ] ./deploy.sh executed successfully
 - [ ] kubectl get nodes shows all nodes Ready
 - [ ] Test application deployed and working
+- [ ] ArgoCD installed (optional)
 
 ---
 

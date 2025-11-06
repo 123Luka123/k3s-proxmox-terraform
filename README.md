@@ -161,7 +161,8 @@ k3s-proxmox-terraform/
 └── ansible/
     ├── inventory.yml            # Ansible inventory
     ├── k3s-install.yml          # K3s installation playbook
-    └── system-utils-install.yml # System utilities installation playbook
+    ├── system-utils-install.yml # System utilities installation playbook
+    └── argocd-install.yml       # ArgoCD installation playbook
 ```
 
 ## Customization
@@ -274,6 +275,7 @@ ansible -i ansible/inventory.yml all -m ping
 # Run specific playbook
 ansible-playbook -i ansible/inventory.yml ansible/k3s-install.yml
 ansible-playbook -i ansible/inventory.yml ansible/system-utils-install.yml
+ansible-playbook -i ansible/inventory.yml ansible/argocd-install.yml
 
 # Check K3s status
 ansible -i ansible/inventory.yml control_plane -a "kubectl get nodes" -b
@@ -400,13 +402,14 @@ qm destroy <VMID>
 
 After deployment, you can:
 
-1. **Install a CNI plugin** (if not using default Flannel)
-2. **Deploy cert-manager** for TLS certificates
-3. **Install Helm** for package management
-4. **Setup Ingress Controller** (Nginx, Traefik)
-5. **Configure persistent storage** (Longhorn, NFS)
-6. **Setup monitoring** (Prometheus, Grafana)
-7. **Deploy applications**
+1. **Install ArgoCD** (optional during deployment) for GitOps workflows
+2. **Install a CNI plugin** (if not using default Flannel)
+3. **Deploy cert-manager** for TLS certificates
+4. **Install Helm** for package management
+5. **Setup Ingress Controller** (Nginx, Traefik)
+6. **Configure persistent storage** (Longhorn, NFS)
+7. **Setup monitoring** (Prometheus, Grafana)
+8. **Deploy applications**
 
 ## Resources
 
