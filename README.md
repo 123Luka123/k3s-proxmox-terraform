@@ -4,11 +4,12 @@ This project deploys a K3s Kubernetes cluster on Proxmox VE using Terraform and 
 
 ## Architecture
 
-- **Control Plane**: 1 node (4 vCPU, 8GB RAM)
-- **Workers**: 3 nodes (2 vCPU, 4GB RAM each) - configurable
-- **Total Resources**: 10 vCPU, 20GB RAM (configurable)
+- **Control Plane**: 1 node (2 vCPU, 4GB RAM, 15GB disk)
+- **Workers**: 3 nodes (1 vCPU, 2GB RAM, 10GB disk each) - configurable
+- **Total Resources**: 5 vCPU, 10GB RAM (configurable)
 - **Network**: 192.168.1.180-187
 - **Storage**: ZFS (local-zfs)
+- **K3s Version**: v1.34.1+k3s1
 - **Provider**: telmate/proxmox v3.0.2-rc05
 
 ## Prerequisites
@@ -31,7 +32,7 @@ sudo apt install jq
 ### On Proxmox:
 - Ubuntu 24.04 cloud template (name: `ubuntu-24.04-cloud-tpl`)
 - API token created: `root@pam!terraform`
-- Available resources: 10+ vCPU, 20+ GB RAM
+- Available resources: 5+ vCPU, 10+ GB RAM
 - ZFS storage pool: `local-zfs`
 - Network bridge: `vmbr0`
 
@@ -163,11 +164,15 @@ Edit `terraform.tfvars`:
 worker_count = 5
 
 # More resources per worker
-worker_cpu = 4
-worker_memory = 8192
+worker_cpu = 2
+worker_memory = 4096
+worker_disk_size = "20G"
 
 # High availability control plane
 control_plane_count = 3
+control_plane_cpu = 4
+control_plane_memory = 8192
+control_plane_disk_size = "30G"
 ```
 
 **Important:** When changing `worker_count`, you must also update the Ansible inventory to match:
@@ -207,7 +212,7 @@ worker_ip_start = "192.168.1.195"
 Edit `terraform.tfvars`:
 
 ```hcl
-k3s_version = "v1.30.0+k3s1"  # Or any valid K3s version
+k3s_version = "v1.34.1+k3s1"  # Current default, change to any valid K3s version
 ```
 
 ## Useful Commands

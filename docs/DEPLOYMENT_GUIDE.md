@@ -5,9 +5,9 @@
 This guide will walk you through deploying a production-ready K3s Kubernetes cluster on Proxmox VE using Terraform and Ansible.
 
 **What you'll get:**
-- 1 Control Plane node (4 vCPU, 8GB RAM)
-- 3 Worker nodes (2 vCPU, 4GB RAM each) - configurable
-- Fully configured K3s cluster
+- 1 Control Plane node (2 vCPU, 4GB RAM, 15GB disk)
+- 3 Worker nodes (1 vCPU, 2GB RAM, 10GB disk each) - configurable
+- Fully configured K3s cluster (v1.34.1+k3s1)
 - Kubeconfig for local access
 - Automated deployment
 - Custom VM IDs starting from 500
@@ -80,15 +80,25 @@ proxmox_api_token_secret = "your-actual-secret-here"
 **Optional:** Customize your deployment by editing other variables:
 
 ```hcl
-# Change cluster size
-worker_count = 2  # Default: 3
+# K3s Version
+k3s_version = "v1.34.1+k3s1"
+
+# Control Plane Configuration
+control_plane_count    = 1
+control_plane_cpu      = 2
+control_plane_memory   = 4096
+control_plane_disk_size = "15G"
+control_plane_ip_start = "192.168.1.180"
+
+# Worker Configuration
+worker_count     = 3
+worker_cpu       = 1
+worker_memory    = 2048
+worker_disk_size = "10G"
+worker_ip_start  = "192.168.1.185"
 
 # Custom VM IDs (avoid conflicts with existing VMs)
 vm_id_start = 500  # Default: 500
-
-# Customize resources
-control_plane_memory = 4096
-worker_memory = 2048
 ```
 
 **Important:** When changing `worker_count`, you must also update the Ansible inventory to match. See the "Customizing Your Deployment" section below.
@@ -173,6 +183,21 @@ If you want to change the number of worker nodes:
    ./deploy.sh
    ```
 
+#### Change Resource Allocation
+
+To increase resources for better performance:
+
+```hcl
+# In terraform.tfvars
+control_plane_cpu = 4
+control_plane_memory = 8192
+control_plane_disk_size = "30G"
+
+worker_cpu = 2
+worker_memory = 4096
+worker_disk_size = "20G"
+```
+
 #### Change VM IDs
 
 To use custom VM IDs (useful if you have existing VMs):
@@ -188,6 +213,13 @@ vm_id_start = 1000  # VMs will be 1000, 1001, 1002, etc.
 # In terraform.tfvars
 control_plane_ip_start = "192.168.1.190"
 worker_ip_start = "192.168.1.195"
+```
+
+#### Change K3s Version
+
+```hcl
+# In terraform.tfvars
+k3s_version = "v1.34.1+k3s1"  # Change to any valid K3s version
 ```
 
 ### Step 8: Access Your Cluster
@@ -565,7 +597,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 - [ ] Proxmox is accessible
 - [ ] Template `ubuntu-24.04-cloud-tpl` exists on Proxmox
 - [ ] IP range 192.168.1.180-187 is available
-- [ ] Sufficient resources (10 vCPU, 20GB RAM)
+- [ ] Sufficient resources (5 vCPU, 10GB RAM)
 - [ ] VM ID range 500-503 is available (or custom vm_id_start configured)
 - [ ] Ansible inventory matches worker_count in terraform.tfvars
 - [ ] ./deploy.sh executed successfully
