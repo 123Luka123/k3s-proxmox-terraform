@@ -11,6 +11,7 @@ This project deploys a K3s Kubernetes cluster on Proxmox VE using Terraform and 
 - **Storage**: ZFS (local-zfs)
 - **K3s Version**: v1.34.1+k3s1
 - **Provider**: telmate/proxmox v3.0.2-rc05
+- **QEMU Guest Agent**: Pre-installed and enabled on all nodes
 
 ## Prerequisites
 

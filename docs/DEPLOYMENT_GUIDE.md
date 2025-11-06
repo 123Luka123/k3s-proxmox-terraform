@@ -11,6 +11,7 @@ This guide will walk you through deploying a production-ready K3s Kubernetes clu
 - Kubeconfig for local access
 - Automated deployment
 - Custom VM IDs starting from 500
+- QEMU Guest Agent pre-installed and enabled
 
 ---
 
