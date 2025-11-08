@@ -52,7 +52,8 @@ terraform apply -auto-approve
 
 # Get the K3s token
 echo -e "\n${GREEN}Step 5: Retrieving K3s token...${NC}"
-export K3S_TOKEN=$(terraform output -raw k3s_token)
+K3S_TOKEN=$(terraform output -raw k3s_token)
+export K3S_TOKEN
 echo "K3s Token: ${K3S_TOKEN}"
 
 # Wait for VMs to be ready
@@ -67,7 +68,7 @@ cd ..
 
 retries=0
 max_retries=30
-until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${CONTROL_PLANE_IP} "echo 'SSH OK'" &> /dev/null; do
+until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 "ubuntu@${CONTROL_PLANE_IP}" "echo 'SSH OK'" &> /dev/null; do
     retries=$((retries+1))
     if [ $retries -ge $max_retries ]; then
         echo -e "${RED}Failed to connect via SSH after ${max_retries} attempts${NC}"
