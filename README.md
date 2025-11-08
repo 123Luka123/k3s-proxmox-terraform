@@ -454,7 +454,7 @@ After deployment, you can:
 2. **Install a CNI plugin** (if not using default Flannel)
 3. **Deploy cert-manager** for TLS certificates
 4. **Install Helm** for package management
-5. **Setup Ingress Controller** (Nginx, Traefik)
+5. **Traefik Ingress Controller** (enabled by default)
 6. **Configure persistent storage** (Longhorn, NFS)
 7. **Setup monitoring** (Prometheus, Grafana)
 8. **Deploy applications** using ArgoCD or kubectl
@@ -466,6 +466,13 @@ Once ArgoCD is installed, you can:
 - Automatically deploy and sync applications
 - Monitor application health through the UI
 - Rollback to previous versions if needed
+
+### Traefik Ingress Controller
+Traefik is now enabled by default in K3s and provides:
+- Built-in ingress controller for routing HTTP/HTTPS traffic
+- Automatic SSL certificate management
+- Load balancing capabilities
+- Service discovery
 
 ## Resources
 
