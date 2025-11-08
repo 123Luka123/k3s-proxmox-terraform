@@ -30,7 +30,6 @@
         K3S_TOKEN={{ k3s_token }} \
         sh /tmp/k3s-install.sh server \
           --cluster-init \
-          --disable=traefik \
           --write-kubeconfig-mode=644 \
           --tls-san={{ ansible_host }} \
           --node-name={{ inventory_hostname }}
