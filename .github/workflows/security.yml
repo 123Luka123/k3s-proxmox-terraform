@@ -71,6 +71,11 @@ jobs:
       contents: read
       security-events: write
     
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'yaml' ]
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -78,8 +83,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        languages: yaml
-        build-mode: none
+        languages: ${{ matrix.language }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
