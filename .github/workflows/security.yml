@@ -43,12 +43,14 @@ jobs:
         terraform_version: 1.5.0
 
     - name: Terraform Security Scan with TFSec
-      uses: aquasecurity/tfsec@latest
+      uses: tfsec/tfsec-sarif-action@master
       with:
-        directory: terraform
-        soft-fail: true
-      env:
-        TF_SECURITY_SCAN: true
+        sarif_file: tfsec.sarif
+
+    - name: Upload TFSec SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: tfsec.sarif
 
     - name: Terraform Security Scan with Checkov
       uses: bridgecrewio/checkov-action@master
